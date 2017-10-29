@@ -7,8 +7,8 @@ public class RoomSensor : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D collision) {
 		GameObject target = collision.gameObject;
-		if (target.tag == "Player") {
-			room.SensorEntered();
+		if (target.tag == "PlayerComponent") {
+			room.sensorEntered();
 		}
 	}
 }

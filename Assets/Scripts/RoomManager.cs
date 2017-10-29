@@ -1,31 +1,44 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
 public class RoomManager : MonoBehaviour {
-	public TextMeshProUGUI enemiesText;
+	UIManager ui;
+	Player player;
 
 	List<Room> rooms = new List<Room>();
+	Room currentRoom = null;
 
 	void Start() {
+		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
+		ui = HushPuppy.safeFindComponent("GameController", "UIManager") as UIManager;
+
 		rooms.Clear();
 		rooms.AddRange(GameObject.FindObjectsOfType<Room>());
 		foreach (Room r in rooms) {
-			r.death_event += UpdateEnemyCount;
+			r.update_enemy_alive_event += updateEnemyCount;
 		}
 
-		SetCurrentRoom(rooms[0]);
+		setCurrentRoom(rooms[0]);
 	}
 
-	void UpdateEnemyCount(int count) {
-		enemiesText.text = "enemies: " + count;
+	public void reset() {
+		currentRoom.reset();
+		StartCoroutine(ui.reset());
+	}
+
+	void updateEnemyCount(int count) {
+		ui.updateEnemyCount(count);
 	}
 	
-	public void SetCurrentRoom(Room room) {
-		// print("current_room: " + rooms.IndexOf(room));
-		room.RoomActive();
-		UpdateEnemyCount(room.enemy_count);
+	public void setCurrentRoom(Room room) {
+		if (currentRoom != null) {
+			currentRoom.setActive(false);
+		}
+
+		currentRoom = room;
+		room.setActive(true);
+		updateEnemyCount(room.enemy_count);
 
 		Camera.main.transform.localPosition = new Vector3(
 			room.transform.localPosition.x,

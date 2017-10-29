@@ -4,19 +4,26 @@ using UnityEngine;
 
 public class Switch : MonoBehaviour {
 
-	public GameObject door;
+	public delegate void VoidDelegate();
+	public event VoidDelegate hit_event;
 
-	// Use this for initialization
-	void Start () {
-		
+	Animator anim;
+	public bool switch_on = false;
+
+	void Start() {
+		anim = this.GetComponentInChildren<Animator>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	void toggleSwitch() {
+		switch_on = !switch_on;
+		anim.SetBool("switch", switch_on);
 	}
 
 	public void takeHit(Arrow arrow) {
-		door.GetComponentInChildren<Animator>().SetTrigger("open");
+		toggleSwitch();
+
+		if (hit_event != null) {
+			hit_event();
+		}
 	}
 }

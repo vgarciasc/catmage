@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour {
 
-	float lastChange = 0f;
+	float last_change = 0f;
 	Rigidbody2D rb;
 	Vector2 last_position;
 	float distance = 20f;
+
+	bool is_stopped = false;
 
 	void Start() {
 		rb = this.GetComponentInChildren<Rigidbody2D>();
@@ -31,7 +33,7 @@ public class Arrow : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
 
-		if (target.tag == "Wall" && Time.time - lastChange > 0.5f) {
+		if (target.tag == "Wall" && Time.time - last_change > 0.1f) {
 			RaycastHit2D hit = Physics2D.Raycast(
 				transform.position,
 				rb.velocity,
@@ -44,14 +46,13 @@ public class Arrow : MonoBehaviour {
 				hit.normal
 			).normalized * magnitude;
 
-			lastChange = Time.time;
+			last_change = Time.time;
 		}
 
 		if (target.tag == "Enemy") {
 			target.GetComponentInChildren<Enemy>().takeHit(this);
 		}
 
-		print(target.tag);
 		if (target.tag == "Switch") {
 			target.GetComponentInChildren<Switch>().takeHit(this);
 		}
@@ -67,10 +68,20 @@ public class Arrow : MonoBehaviour {
 			);
 
 			if (distance <= 0f) {
-				Destroy(this.gameObject);
+				stop();
 			}
 		}
 
 		last_position = transform.position;
+	}
+
+	void stop() {
+		rb.velocity = Vector2.zero;
+		is_stopped = true;
+		this.gameObject.layer = LayerMask.NameToLayer("Default");
+	}
+
+	public void destroy() {
+		Destroy(this.gameObject);
 	}
 }

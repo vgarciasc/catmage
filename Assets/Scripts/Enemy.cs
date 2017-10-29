@@ -6,33 +6,23 @@ public class Enemy : MonoBehaviour {
 	public delegate void VoidDelegate();
 	public event VoidDelegate death_event;
 
-	bool isDead = false;
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	bool is_dead = false;
 
 	public void takeHit(Arrow arrow) {
 		Death();
 	}
 
 	void Death() {
-		if (isDead) {
+		if (is_dead) {
 			return;
 		}
 
-		isDead = true;
+		is_dead = true;
 
 		if (death_event != null) {
 			death_event();
 		}
 
-		Destroy(this.gameObject);
+		this.gameObject.SetActive(false);
 	}
 }

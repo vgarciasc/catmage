@@ -9,10 +9,10 @@ public class Enemy : MonoBehaviour {
 	bool is_dead = false;
 
 	public void takeHit(Arrow arrow) {
-		Death();
+		death();
 	}
 
-	void Death() {
+	void death() {
 		if (is_dead) {
 			return;
 		}
@@ -24,5 +24,9 @@ public class Enemy : MonoBehaviour {
 		}
 
 		this.gameObject.SetActive(false);
+	}
+
+	public void reset() {
+		is_dead = false;
 	}
 }

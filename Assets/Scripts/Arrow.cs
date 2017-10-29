@@ -119,13 +119,15 @@ public class Arrow : MonoBehaviour {
 		recall_circle.transform.localScale = Vector3.zero;
 		var tween = recall_circle.transform.DOScale(original_scale, 0.1f);
 		tween.SetEase(Ease.OutCubic);
+
+		this.gameObject.layer = LayerMask.NameToLayer("Default");
 	}
 
 	void handleRecall() {
 		if (is_recalling) {
 			Vector2 distance = (player.transform.position - this.transform.position);
 			rb.velocity = (distance.normalized * 5f);
-			rb.angularVelocity = 2500f / Mathf.Pow(distance.magnitude, 1.2f);
+			rb.angularVelocity = 2500f / Mathf.Pow(distance.magnitude < 0.1f ? 0.1f : distance.magnitude, 1.2f);
 		}
 	}
 }

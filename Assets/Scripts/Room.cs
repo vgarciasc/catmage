@@ -95,6 +95,7 @@ public class Room : MonoBehaviour {
 		foreach (EnemyStartPos e in enemies_start) {
 			e.enemy.gameObject.transform.position = e.position;
 			e.enemy.gameObject.SetActive(true);
+			e.enemy.reset();
 		}
 
 		updateEnemyAliveCount(enemies_start.Count);

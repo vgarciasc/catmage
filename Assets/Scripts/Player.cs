@@ -5,9 +5,11 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 	public GameObject arrow_prefab;
 	public GameObject animation_obj;
+	public LineOfShot line;
 
 	int arrow_count = 1;
 	bool block_walk = false;
+	bool block_recall = false;
 	UIManager ui;
 
 	Animator animator;
@@ -29,6 +31,17 @@ public class Player : MonoBehaviour {
 		handleShot();
 		handleReset();
 		handleArrowRecall();
+
+		if (Input.GetMouseButton(0)) {
+			line.Set_Line(
+				LineOfShot.Get_Trajectory(this.transform.position,
+				Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position,
+				30f
+			));
+		}
+		if (Input.GetMouseButtonUp(0)) {
+			line.Deactivate();
+		}
 	}
 
 	void handleMovement() {
@@ -82,7 +95,7 @@ public class Player : MonoBehaviour {
 	}
 
 	void handleArrowRecall() {
-		if (Input.GetKeyDown(KeyCode.E)) {
+		if (Input.GetKeyDown(KeyCode.E) && !block_recall) {
 			var arrows = FindObjectsOfType<Arrow>();
 			foreach (Arrow a in arrows) {
 				a.recall();
@@ -108,12 +121,11 @@ public class Player : MonoBehaviour {
 	}
 
 	public void reset(Vector3 position) {
-		// this.transform.position = position;
 		updateArrow(1);
 	}
 
 	void AnimBlockWalk(int value) {
-		block_walk = value == 1;
+		block_walk = block_recall = value == 1;
 
 		if (block_walk) {
 			rb.velocity = Vector3.zero;

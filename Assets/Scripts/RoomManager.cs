@@ -9,6 +9,8 @@ public class RoomManager : MonoBehaviour {
 	List<Room> rooms = new List<Room>();
 	Room currentRoom = null;
 
+	public Room startRoom;
+
 	void Start() {
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		ui = HushPuppy.safeFindComponent("GameController", "UIManager") as UIManager;
@@ -19,7 +21,7 @@ public class RoomManager : MonoBehaviour {
 			r.update_enemy_alive_event += updateEnemyCount;
 		}
 
-		setCurrentRoom(rooms[0]);
+		setCurrentRoom(startRoom);
 	}
 
 	public void reset() {

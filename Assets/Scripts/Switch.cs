@@ -15,7 +15,11 @@ public class Switch : MonoBehaviour {
 	}
 
 	void toggleSwitch() {
-		switch_on = !switch_on;
+		toggleSwitch(!switch_on);
+	}
+
+	void toggleSwitch(bool value) {
+		switch_on = value;
 		anim.SetBool("switch", switch_on);
 	}
 
@@ -24,6 +28,12 @@ public class Switch : MonoBehaviour {
 
 		if (hit_event != null) {
 			hit_event();
+		}
+	}
+
+	public void reset() {
+		if (switch_on) {
+			toggleSwitch(false);
 		}
 	}
 }

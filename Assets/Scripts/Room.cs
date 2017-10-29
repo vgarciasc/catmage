@@ -82,6 +82,16 @@ public class Room : MonoBehaviour {
 			a.destroy();
 		}
 
+		var switches = GameObject.FindObjectsOfType<Switch>();
+		foreach (Switch s in switches) {
+			s.reset();
+		}
+
+		var doors = GameObject.FindObjectsOfType<Door>();
+		foreach (Door d in doors) {
+			d.reset();
+		}
+
 		foreach (EnemyStartPos e in enemies_start) {
 			e.enemy.gameObject.transform.position = e.position;
 			e.enemy.gameObject.SetActive(true);

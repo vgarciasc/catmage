@@ -28,6 +28,7 @@ public class Player : MonoBehaviour {
 		handleMovement();
 		handleShot();
 		handleReset();
+		handleArrowRecall();
 	}
 
 	void handleMovement() {
@@ -80,6 +81,15 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	void handleArrowRecall() {
+		if (Input.GetKeyDown(KeyCode.E)) {
+			var arrows = FindObjectsOfType<Arrow>();
+			foreach (Arrow a in arrows) {
+				a.recall();
+			}
+		}
+	}
+
 	void OnTriggerEnter2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
 		if (target.tag == "Arrow") {
@@ -98,7 +108,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public void reset(Vector3 position) {
-		this.transform.position = position;
+		// this.transform.position = position;
 		updateArrow(1);
 	}
 

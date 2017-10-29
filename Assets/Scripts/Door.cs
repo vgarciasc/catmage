@@ -57,4 +57,21 @@ public class Door : MonoBehaviour {
 	void closeDoor() {
 		anim.SetBool("open", false);
 	}
+
+	bool shouldOpen() {
+		if (trigger == DoorActivationTrigger.NO_ENEMIES) {
+			return false;
+		}
+		else if (trigger == DoorActivationTrigger.SWITCH) {
+			return switch_obj.switch_on;
+		}
+
+		return false;
+	}
+
+	public void reset() {
+		if (!shouldOpen()) {
+			closeDoor();
+		}
+	}
 }

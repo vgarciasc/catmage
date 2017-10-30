@@ -46,5 +46,8 @@ public class RoomManager : MonoBehaviour {
 			room.transform.localPosition.x,
 			room.transform.localPosition.y,
 			-10);
+
+		ui.toggle(room.shows_UI);
+		player.blockBattle(room.battle_possible);
 	}
 }

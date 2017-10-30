@@ -23,6 +23,8 @@ public class Room : MonoBehaviour {
 	public event EnemyCountDelegate update_enemy_alive_event;
 
 	public int enemy_count = -1;
+	public bool shows_UI = true;
+	public bool battle_possible = true;
 
 	//reset variables
 	Vector3 player_start_position;

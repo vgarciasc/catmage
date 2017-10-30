@@ -7,7 +7,8 @@ using DG.Tweening;
 
 public class UIManager : MonoBehaviour {
 	public TextMeshProUGUI enemies_text;
-	public Image arrow;
+	public GameObject arrow_container;
+	public Image arrow_image;
 	public Image foreground;
 
 	public void updateEnemyCount(int count) {
@@ -19,12 +20,12 @@ public class UIManager : MonoBehaviour {
 		float size = 0.1f;
 
 		if (count == 0) {
-			arrow.DOFade(0.2f, duration);
-			arrow.transform.DOScale(arrow.transform.localScale - Vector3.one * size, duration);
+			arrow_image.DOFade(0.2f, duration);
+			arrow_image.transform.DOScale(arrow_image.transform.localScale - Vector3.one * size, duration);
 		}
 		else {
-			arrow.DOFade(1f, duration);
-			arrow.transform.DOScale(arrow.transform.localScale + Vector3.one * size, duration);
+			arrow_image.DOFade(1f, duration);
+			arrow_image.transform.DOScale(arrow_image.transform.localScale + Vector3.one * size, duration);
 		}
 	}
 
@@ -34,5 +35,10 @@ public class UIManager : MonoBehaviour {
 		yield return new WaitForSeconds(0.2f);
 
 		foreground.gameObject.SetActive(false);
+	}
+
+	public void toggle(bool value) {
+		enemies_text.gameObject.SetActive(value);
+		arrow_container.gameObject.SetActive(value);
 	}
 }

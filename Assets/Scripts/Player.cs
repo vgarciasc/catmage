@@ -10,12 +10,16 @@ public class Player : MonoBehaviour {
 	int arrow_count = 1;
 	bool block_walk = false;
 	bool block_recall = false;
-	UIManager ui;
+	bool block_shooting = false;
+	bool just_ended_text = false;
 
 	Animator animator;
 	Rigidbody2D rb;
 	SpriteRenderer sr;
+
+	UIManager ui;
 	RoomManager roomManager;
+	DialogManager dialogManager;
 
 	void Start () {
 		animator = this.GetComponentInChildren<Animator>();		
@@ -24,24 +28,17 @@ public class Player : MonoBehaviour {
 
 		ui = HushPuppy.safeFindComponent("GameController", "UIManager") as UIManager;
 		roomManager = HushPuppy.safeFindComponent("GameController", "RoomManager") as RoomManager;
+		dialogManager = DialogManager.getDialogManager();
+
+		dialogManager.set_active_event += reactToText;
 	}
-	
+
 	void Update () {
 		handleMovement();
 		handleShot();
+		handleLineOfShot();
 		handleReset();
 		handleArrowRecall();
-
-		if (Input.GetMouseButton(0)) {
-			line.Set_Line(
-				LineOfShot.Get_Trajectory(this.transform.position,
-				Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position,
-				30f
-			));
-		}
-		if (Input.GetMouseButtonUp(0)) {
-			line.Deactivate();
-		}
 	}
 
 	void handleMovement() {
@@ -80,11 +77,41 @@ public class Player : MonoBehaviour {
 	}
 
 	void handleShot() {
-		if (Input.GetButtonUp("Fire1") && arrow_count > 0) {
+		if (arrow_count <= 0 || block_shooting) {
+			return;
+		}
+		
+		if (Input.GetButtonUp("Fire1")) {
+			if (just_ended_text) {
+				just_ended_text = false;
+				return;
+			}
+
 			Vector2 velocity = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position;
 			GameObject arrow = Instantiate(arrow_prefab, this.transform.position, Quaternion.identity);
 			arrow.GetComponentInChildren<Rigidbody2D>().velocity = velocity.normalized * 5f;
 			updateArrow(arrow_count - 1);
+		}
+	}
+
+	void handleLineOfShot() {
+		if (block_shooting) {
+			return;
+		}
+
+		if (Input.GetMouseButton(0)) {
+			if (just_ended_text) {
+				return;
+			}
+
+			line.Set_Line(
+				LineOfShot.Get_Trajectory(this.transform.position,
+				Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position,
+				30f
+			));
+		}
+		if (Input.GetMouseButtonUp(0)) {
+			line.Deactivate();
 		}
 	}
 
@@ -124,12 +151,35 @@ public class Player : MonoBehaviour {
 		updateArrow(1);
 	}
 
-	void AnimBlockWalk(int value) {
-		block_walk = block_recall = value == 1;
+	public void blockBattle(bool value) {
+		blockShooting(value);
+	}
 
+	void blockShooting(bool value) {
+		block_shooting = value;
+	}
+
+	void blockWalk(bool value) {
+		block_walk = value;
 		if (block_walk) {
 			rb.velocity = Vector3.zero;
+			animator.SetBool("walking", false);
 		}
+	}
+
+	void reactToText(bool value) {
+		blockWalk(value);
+		blockShooting(value);
+
+		if (!value) {
+			just_ended_text = true;
+		}
+	}
+
+	void AnimBlockWalk(int value) {
+		var val = value == 1;
+		block_recall = val;
+		blockWalk(val);
 	}
 
 	void AnimResetEnd() {

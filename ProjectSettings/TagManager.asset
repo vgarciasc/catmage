@@ -43,11 +43,17 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 2326848555
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
   - name: Wall
     uniqueID: 3860174469
+    locked: 0
+  - name: Furniture
+    uniqueID: 707080713
     locked: 0
   - name: Arrow
     uniqueID: 4146782977

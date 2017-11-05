@@ -9,7 +9,7 @@ public class Arrow : MonoBehaviour {
 	SpriteRenderer sr;
 	Player player;
 	Vector2 last_position;
-	float distance = 5f;
+	float distance = 25f;
 	float last_change = 0f;
 	bool is_stopped = false;
 	bool is_recalling = false;
@@ -43,22 +43,32 @@ public class Arrow : MonoBehaviour {
 			transform.rotation = Quaternion.Euler(0f, 0f, angle - 90);
 		}
 	}
-	
+
+	Hashtable walltime_hash = new Hashtable();	
 	void OnTriggerEnter2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
 
-		if (target.tag == "Wall" && Time.time - last_change > 0.1f) {
+		if (target.tag == "Wall") {
+			if (walltime_hash.ContainsKey(target.name) && Time.time - (float) walltime_hash[target.name] < 0.05f) {
+				return;
+			}
+
 			RaycastHit2D hit = Physics2D.Raycast(
 				transform.position,
 				rb.velocity,
 				Mathf.Infinity
 			);
 
+			var aux = rb.velocity;
+
 			float magnitude = rb.velocity.magnitude;
 			rb.velocity = Vector2.Reflect(
 				hit.point - (Vector2) transform.position,
 				hit.normal
 			).normalized * magnitude;
+			// Debug.Break();
+			print("collided with: " + target + "\n[(" + aux.x + ", " + aux.y + ") => (" + rb.velocity.x + ", " + rb.velocity.y + ")]");
+			walltime_hash[target.name] = Time.time;
 
 			last_change = Time.time;
 		}
@@ -84,6 +94,11 @@ public class Arrow : MonoBehaviour {
 				last_position,
 				transform.position
 			);
+
+			if (distance <= 6f) {
+				float magnitude = rb.velocity.magnitude;
+				rb.velocity = rb.velocity.normalized * magnitude * distance / 6f;
+			}
 
 			if (distance <= 0f) {
 				stop();

@@ -18,11 +18,12 @@ public class Room : MonoBehaviour {
 	List<Enemy> enemies = new List<Enemy>();
 
 	bool room_active = false;
+	int id = -1;
 
 	public delegate void EnemyCountDelegate(int count);
 	public event EnemyCountDelegate update_enemy_alive_event;
 
-	public int enemy_count = -1;
+	public int enemy_count = 0;
 	public bool shows_UI = true;
 	public bool battle_possible = true;
 
@@ -40,10 +41,15 @@ public class Room : MonoBehaviour {
 			e.death_event += enemyDeath;
 			enemies_start.Add(new EnemyStartPos(e, e.gameObject.transform.position));
 		}
+		enemy_count = enemies.Count;
 
 		if (room_active) {
 			updateEnemyAliveCount(enemies.Count);
 		}
+	}
+
+	public void setID(int id) {
+		this.id = id;
 	}
 
 	public void setActive(bool value) {
@@ -54,13 +60,15 @@ public class Room : MonoBehaviour {
 		}
 		
 		if (value) {
-			updateEnemyAliveCount(enemies.Count);
+			updateEnemyAliveCount(enemy_count);
 			player_start_position = player.transform.position;
 		}
 	}
 
 	void updateEnemyAliveCount(int amount) {
 		enemy_count = amount;
+
+		print(amount);
 
 		if (update_enemy_alive_event != null) {
 			update_enemy_alive_event(amount);
@@ -72,7 +80,6 @@ public class Room : MonoBehaviour {
 	}
 
 	public void sensorEntered() {
-		setActive(true);
 		roomManager.setCurrentRoom(this);
 	}
 

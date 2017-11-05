@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class DialogCharacter : MonoBehaviour {
 
-	DialogManager dialogManager;
+	public string dialogID = "";
+	public Sprite portrait;
 	
+	DialogManager dialogManager;
 	bool in_range = false;
 	bool talking = false;
 
@@ -33,7 +35,7 @@ public class DialogCharacter : MonoBehaviour {
 
 	void handleText() {
 		if (Input.GetKeyDown(KeyCode.Q) && in_range && !dialogManager.dialog_active) {
-			dialogManager.start();
+			dialogManager.start(dialogID, portrait);
 		}
 	}
 }

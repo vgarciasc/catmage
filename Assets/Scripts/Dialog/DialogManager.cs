@@ -1,12 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
+using Ink.Runtime;
 
 public class DialogManager : MonoBehaviour {
 
+	public TextAsset inkAsset;
 	public TextMeshProUGUI dialogText;
 	public Animator dialogAnim;
+	public Image portraitLeft;
+	public Image portraitRight;
+
+	public bool dialog_active = false;
 
 	public delegate void SetActiveDelegate(bool value);
 	public event SetActiveDelegate set_active_event;
@@ -14,8 +21,8 @@ public class DialogManager : MonoBehaviour {
 	bool skip_display = false;
 	bool next_dialog = false;
 	bool text_running = false;
-
-	public bool dialog_active = false;
+	Story _story;
+	string savedJson = "";
 
 	public static DialogManager getDialogManager() {
 		return (DialogManager) HushPuppy.safeFindComponent("GameController", "DialogManager");
@@ -28,7 +35,16 @@ public class DialogManager : MonoBehaviour {
 		}
 	}
 
-	public void start() {
+	public void start(string dialogID, Sprite portrait) {
+		handlePortraits(portrait);
+
+		_story = new Story(inkAsset.text);
+		if (savedJson != "") {
+			_story.state.LoadJson(savedJson);
+		}
+
+		_story.ChoosePathString(dialogID);
+
 		toggle(true);
 		StartCoroutine(Text());
 	}
@@ -36,17 +52,16 @@ public class DialogManager : MonoBehaviour {
 	IEnumerator Text() {
 		dialogAnim.gameObject.SetActive(true);
 		dialogAnim.SetBool("active", true);
-		List<string> aux = new List<string> {
-			"The boss will see you...",
-			"...eventually!"
-		};
 
-		for (int i = 0; i < aux.Count; i++) {
-			yield return Display_String(aux[i], 3);
+		while (_story.canContinue) {
+			string str = _story.Continue();
+
+			yield return Display_String(str, 1);
 			dialogAnim.SetBool("idle_on", true);
-			yield return new WaitUntil(() => Input.GetButtonDown("Fire1"));
-		}
+			yield return new WaitUntil(() => (Input.GetButtonDown("Fire1") || Input.GetKeyDown(KeyCode.Q)));
+		}		
 		
+		savedJson = _story.state.ToJson();
 		dialogAnim.SetBool("active", false);
 		toggle(false);
 	}
@@ -56,19 +71,31 @@ public class DialogManager : MonoBehaviour {
 		int current_character = 0;
 		text_running = true;
 
-		while (true) {
+		for (current_character = 0; current_character < text.Length; current_character++) {
 			if (current_character == text.Length ||
 				skip_display) {
 				break;
 			}
 
-			dialogText.text = text.Substring(0, current_character++);
-			// audioManager.Play();
+			dialogText.text = text.Substring(0, current_character) + "<color=#0000>" + text.Substring(current_character) + "</color>";
 			yield return HushPuppy.WaitForEndOfFrames(speed);
 		}
 
 		skip_display = false;
 		text_running = false;
 		dialogText.text = text;
+	}
+
+	void handlePortraits(Sprite portrait) {
+		if (portrait == null) {
+			portraitLeft.gameObject.SetActive(false);
+			portraitRight.gameObject.SetActive(false);
+			return;
+		}
+
+		portraitLeft.gameObject.SetActive(true);
+		portraitRight.gameObject.SetActive(true);
+
+		portraitRight.sprite = portrait;
 	}
 }

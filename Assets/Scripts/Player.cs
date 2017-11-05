@@ -39,6 +39,7 @@ public class Player : MonoBehaviour {
 		handleLineOfShot();
 		handleReset();
 		handleArrowRecall();
+		handlePause();
 	}
 
 	void handleMovement() {
@@ -128,6 +129,27 @@ public class Player : MonoBehaviour {
 				a.recall();
 			}
 		}
+	}
+
+	bool isPausing = false;
+	float pause = 1f;
+	void handlePause() {
+		if (Input.GetKeyDown(KeyCode.F)) {
+			isPausing = true;
+		}
+
+		if (Input.GetKeyUp(KeyCode.F)) {
+			isPausing = false;
+		}
+
+		if (isPausing) {
+			pause -= Time.deltaTime * 0.1f;
+		}
+
+		if (pause <= 0f) {
+			pause = 0f;
+		}
+		// ui.set_pause(pause);
 	}
 
 	void OnTriggerEnter2D(Collider2D collider) {

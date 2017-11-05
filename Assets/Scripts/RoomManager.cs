@@ -18,6 +18,7 @@ public class RoomManager : MonoBehaviour {
 		rooms.Clear();
 		rooms.AddRange(GameObject.FindObjectsOfType<Room>());
 		foreach (Room r in rooms) {
+			r.setID(rooms.IndexOf(r));
 			r.update_enemy_alive_event += updateEnemyCount;
 		}
 
@@ -35,6 +36,10 @@ public class RoomManager : MonoBehaviour {
 	
 	public void setCurrentRoom(Room room) {
 		if (currentRoom != null) {
+			if (currentRoom == room) {
+				return;
+			}
+
 			currentRoom.setActive(false);
 		}
 
@@ -48,6 +53,6 @@ public class RoomManager : MonoBehaviour {
 			-10);
 
 		ui.toggle(room.shows_UI);
-		player.blockBattle(room.battle_possible);
+		player.blockBattle(!room.battle_possible);
 	}
 }

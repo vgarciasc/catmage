@@ -17,6 +17,8 @@ public class Arrow : MonoBehaviour {
 	public ParticleSystem recall_ps;
 	public GameObject recall_circle;
 
+	bool collided_this_frame = false;
+
 	void Start() {
 		rb = this.GetComponentInChildren<Rigidbody2D>();
 		sr = this.GetComponentInChildren<SpriteRenderer>();
@@ -25,6 +27,7 @@ public class Arrow : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
+		collided_this_frame = false;
 		handleMaxDistance();
 	}
 
@@ -49,9 +52,14 @@ public class Arrow : MonoBehaviour {
 		GameObject target = collider.gameObject;
 
 		if (target.tag == "Wall") {
-			if (walltime_hash.ContainsKey(target.name) && Time.time - (float) walltime_hash[target.name] < 0.05f) {
+			// if (walltime_hash.ContainsKey(target.name) && Time.time - (float) walltime_hash[target.name] < 0.05f) {
+			// 	return;
+			// }
+			if (collided_this_frame) {
 				return;
 			}
+
+			collided_this_frame = true;
 
 			RaycastHit2D hit = Physics2D.Raycast(
 				transform.position,
@@ -66,6 +74,9 @@ public class Arrow : MonoBehaviour {
 				hit.point - (Vector2) transform.position,
 				hit.normal
 			).normalized * magnitude;
+
+			// this.transform.position += (Vector3) rb.velocity * Time.deltaTime;
+
 			// Debug.Break();
 			print("collided with: " + target + "\n[(" + aux.x + ", " + aux.y + ") => (" + rb.velocity.x + ", " + rb.velocity.y + ")]");
 			walltime_hash[target.name] = Time.time;

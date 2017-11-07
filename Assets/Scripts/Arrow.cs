@@ -24,10 +24,27 @@ public class Arrow : MonoBehaviour {
 		sr = this.GetComponentInChildren<SpriteRenderer>();
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		last_position = transform.position;
+
+		StartCoroutine(foo());
+	}
+
+	IEnumerator foo() {
+		while (true) {
+			var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
+			rb.velocity = (this.transform.position - (Vector3) aux[1]).normalized;
+
+			yield return new WaitForSeconds(1f);
+		}
 	}
 
 	void FixedUpdate() {
 		collided_this_frame = false;
+
+		var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
+		for (int i = 0; i < aux.Count - 1; i++) {
+			Debug.DrawRay(aux[i], aux[i+1] - aux[i], Color.blue, Time.deltaTime);
+		}
+
 		handleMaxDistance();
 	}
 
@@ -49,6 +66,7 @@ public class Arrow : MonoBehaviour {
 
 	Hashtable walltime_hash = new Hashtable();	
 	void OnTriggerEnter2D(Collider2D collider) {
+		return;
 		GameObject target = collider.gameObject;
 
 		if (target.tag == "Wall") {

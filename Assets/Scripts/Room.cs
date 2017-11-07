@@ -68,8 +68,6 @@ public class Room : MonoBehaviour {
 	void updateEnemyAliveCount(int amount) {
 		enemy_count = amount;
 
-		print(amount);
-
 		if (update_enemy_alive_event != null) {
 			update_enemy_alive_event(amount);
 		}

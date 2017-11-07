@@ -29,6 +29,8 @@ public class LineOfShot : MonoBehaviour {
 			(1 << LayerMask.NameToLayer("Ricochettable"))
 		);
 
+		Debug.DrawRay(position, direction, Color.red, 0.1f);
+
 		if (hit.collider == null) {
 			points.Add(
 				position + direction.normalized * distance

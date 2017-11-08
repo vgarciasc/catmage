@@ -29,7 +29,7 @@ public class LineOfShot : MonoBehaviour {
 			(1 << LayerMask.NameToLayer("Ricochettable"))
 		);
 
-		Debug.DrawRay(position, direction, Color.red, 0.1f);
+		// print("position: " + position + ", direction: " + direction);
 
 		if (hit.collider == null) {
 			points.Add(
@@ -53,7 +53,14 @@ public class LineOfShot : MonoBehaviour {
 			hit.normal
 		);
 
+		var k = 0;
+
 		while (true) {
+			k ++;
+			if (k > 30) {
+				break;
+			}
+
 			hit = Physics2D.Raycast(
 				point_aux,
 				reflection,

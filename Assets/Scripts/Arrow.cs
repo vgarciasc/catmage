@@ -9,7 +9,7 @@ public class Arrow : MonoBehaviour {
 	SpriteRenderer sr;
 	Player player;
 	Vector2 last_position;
-	float distance = 25f;
+	float distance = 100f;
 	float last_change = 0f;
 	bool is_stopped = false;
 	bool is_recalling = false;
@@ -25,22 +25,51 @@ public class Arrow : MonoBehaviour {
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		last_position = transform.position;
 
-		StartCoroutine(foo());
+		// StartCoroutine(foo());
 	}
 
 	IEnumerator foo() {
+		var orig_dir = rb.velocity;
+		rb.velocity = Vector2.zero;
+		
 		while (true) {
-			var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
-			rb.velocity = (this.transform.position - (Vector3) aux[1]).normalized;
-
-			yield return new WaitForSeconds(1f);
+			var aux = LineOfShot.Get_Trajectory(this.transform.position, orig_dir, 40);
+			string d = "";
+			foreach (Vector2 v in aux) {
+				d += v.ToString() + ", ";
+			}
+			// print (d);
+			for (int i = 0; i < aux.Count - 1; i++) {
+				Debug.DrawRay(aux[i], aux[i+1] - aux[i], Color.blue, 1f);
+			}
+			rb.velocity = - (this.transform.position - (Vector3) aux[1]).normalized;
+			orig_dir = rb.velocity;
 		}
 	}
 
 	void FixedUpdate() {
 		collided_this_frame = false;
 
+		RaycastHit2D hit = Physics2D.Raycast(
+			transform.position,
+			rb.velocity,
+			0.3f,
+			(1 << LayerMask.NameToLayer("Ricochettable"))
+		);
+
+		Vector2 reflection;
+		if (hit.collider != null) {
+			reflection = Vector2.Reflect(
+				(Vector3) hit.point - transform.position,
+				hit.normal
+			);
+			rb.velocity = reflection.normalized * 5;
+		}
+
+		Debug.DrawLine(transform.position, transform.position + (Vector3) rb.velocity.normalized, Color.green, Time.fixedDeltaTime);
+
 		var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
+		rb.velocity = ((Vector3) aux[1] - this.transform.position).normalized * 5;
 		for (int i = 0; i < aux.Count - 1; i++) {
 			Debug.DrawRay(aux[i], aux[i+1] - aux[i], Color.blue, Time.deltaTime);
 		}
@@ -96,7 +125,7 @@ public class Arrow : MonoBehaviour {
 			// this.transform.position += (Vector3) rb.velocity * Time.deltaTime;
 
 			// Debug.Break();
-			print("collided with: " + target + "\n[(" + aux.x + ", " + aux.y + ") => (" + rb.velocity.x + ", " + rb.velocity.y + ")]");
+			// print("collided with: " + target + "\n[(" + aux.x + ", " + aux.y + ") => (" + rb.velocity.x + ", " + rb.velocity.y + ")]");
 			walltime_hash[target.name] = Time.time;
 
 			last_change = Time.time;

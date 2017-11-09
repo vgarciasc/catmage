@@ -9,77 +9,50 @@ public class Arrow : MonoBehaviour {
 	SpriteRenderer sr;
 	Player player;
 	Vector2 last_position;
-	float distance = 100f;
+	float distance = 20f;
 	float last_change = 0f;
+	float speed = 5f;
 	bool is_stopped = false;
 	bool is_recalling = false;
 
+
+	Vector2 last_velocity;
+	LayerMask layer;
+
 	public ParticleSystem recall_ps;
 	public GameObject recall_circle;
-
-	bool collided_this_frame = false;
+	public GameObject tip;
 
 	void Start() {
 		rb = this.GetComponentInChildren<Rigidbody2D>();
 		sr = this.GetComponentInChildren<SpriteRenderer>();
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		last_position = transform.position;
-
-		// StartCoroutine(foo());
-	}
-
-	IEnumerator foo() {
-		var orig_dir = rb.velocity;
-		rb.velocity = Vector2.zero;
-		
-		while (true) {
-			var aux = LineOfShot.Get_Trajectory(this.transform.position, orig_dir, 40);
-			string d = "";
-			foreach (Vector2 v in aux) {
-				d += v.ToString() + ", ";
-			}
-			// print (d);
-			for (int i = 0; i < aux.Count - 1; i++) {
-				Debug.DrawRay(aux[i], aux[i+1] - aux[i], Color.blue, 1f);
-			}
-			rb.velocity = - (this.transform.position - (Vector3) aux[1]).normalized;
-			orig_dir = rb.velocity;
-		}
 	}
 
 	void FixedUpdate() {
-		collided_this_frame = false;
-
-		RaycastHit2D hit = Physics2D.Raycast(
-			transform.position,
-			rb.velocity,
-			0.3f,
-			(1 << LayerMask.NameToLayer("Ricochettable"))
-		);
-
-		Vector2 reflection;
-		if (hit.collider != null) {
-			reflection = Vector2.Reflect(
-				(Vector3) hit.point - transform.position,
-				hit.normal
-			);
-			rb.velocity = reflection.normalized * 5;
-		}
-
-		Debug.DrawLine(transform.position, transform.position + (Vector3) rb.velocity.normalized, Color.green, Time.fixedDeltaTime);
-
-		var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
-		rb.velocity = ((Vector3) aux[1] - this.transform.position).normalized * 5;
-		for (int i = 0; i < aux.Count - 1; i++) {
-			Debug.DrawRay(aux[i], aux[i+1] - aux[i], Color.blue, Time.deltaTime);
-		}
-
+		handleMovement();
 		handleMaxDistance();
 	}
 
 	void Update() {
+		if (Input.GetKeyDown(KeyCode.P)) {
+			pause();
+		}
+		else if (Input.GetKeyDown(KeyCode.U)) {
+			unpause();
+		}
+
 		pointToDirection(rb.velocity);
 		handleRecall();
+	}
+
+	void OnTriggerEnter2D(Collider2D collider) {
+		GameObject target = collider.gameObject;
+
+		if (target.tag == "Enemy") {
+			target.GetComponentInChildren<Enemy>().takeHit(this);
+		}
 	}
 
 	void pointToDirection(Vector2 velocity) {
@@ -93,51 +66,25 @@ public class Arrow : MonoBehaviour {
 		}
 	}
 
-	Hashtable walltime_hash = new Hashtable();	
-	void OnTriggerEnter2D(Collider2D collider) {
-		return;
-		GameObject target = collider.gameObject;
+	void handleMovement() {
+		RaycastHit2D hit = Physics2D.Raycast(
+			transform.position,
+			rb.velocity,
+			0.3f,
+			(1 << LayerMask.NameToLayer("Ricochettable"))
+		);
 
-		if (target.tag == "Wall") {
-			// if (walltime_hash.ContainsKey(target.name) && Time.time - (float) walltime_hash[target.name] < 0.05f) {
-			// 	return;
-			// }
-			if (collided_this_frame) {
-				return;
-			}
-
-			collided_this_frame = true;
-
-			RaycastHit2D hit = Physics2D.Raycast(
-				transform.position,
-				rb.velocity,
-				Mathf.Infinity
-			);
-
-			var aux = rb.velocity;
-
-			float magnitude = rb.velocity.magnitude;
-			rb.velocity = Vector2.Reflect(
-				hit.point - (Vector2) transform.position,
+		Vector2 reflection;
+		if (hit.collider != null) {
+			reflection = Vector2.Reflect(
+				(Vector3) hit.point - transform.position,
 				hit.normal
-			).normalized * magnitude;
-
-			// this.transform.position += (Vector3) rb.velocity * Time.deltaTime;
-
-			// Debug.Break();
-			// print("collided with: " + target + "\n[(" + aux.x + ", " + aux.y + ") => (" + rb.velocity.x + ", " + rb.velocity.y + ")]");
-			walltime_hash[target.name] = Time.time;
-
-			last_change = Time.time;
+			);
+			rb.velocity = reflection.normalized;
 		}
 
-		if (target.tag == "Enemy") {
-			target.GetComponentInChildren<Enemy>().takeHit(this);
-		}
-
-		if (target.tag == "Switch") {
-			target.GetComponentInChildren<Switch>().takeHit(this);
-		}
+		var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
+		rb.velocity = ((Vector3) aux[1] - this.transform.position).normalized * speed;
 	}
 
 	void handleMaxDistance() {
@@ -153,9 +100,9 @@ public class Arrow : MonoBehaviour {
 				transform.position
 			);
 
-			if (distance <= 6f) {
+			if (distance <= 1f) {
 				float magnitude = rb.velocity.magnitude;
-				rb.velocity = rb.velocity.normalized * magnitude * distance / 6f;
+				rb.velocity = rb.velocity.normalized * magnitude * distance / 1f;
 			}
 
 			if (distance <= 0f) {
@@ -170,6 +117,24 @@ public class Arrow : MonoBehaviour {
 		rb.velocity = Vector2.zero;
 		is_stopped = true;
 		this.gameObject.layer = LayerMask.NameToLayer("Default");
+	}
+
+	public void pause() {
+		if (is_stopped) {
+			return;
+		}
+		
+		last_velocity = rb.velocity;
+		rb.velocity = Vector2.zero;
+		is_stopped = true;
+		layer = this.gameObject.layer;
+		this.gameObject.layer = LayerMask.NameToLayer("Default");
+	}
+
+	public void unpause() {
+		rb.velocity = last_velocity;
+		is_stopped = false;
+		this.gameObject.layer = layer;
 	}
 
 	public void destroy() {
@@ -202,5 +167,9 @@ public class Arrow : MonoBehaviour {
 			rb.velocity = (distance.normalized * 5f);
 			rb.angularVelocity = 2500f / Mathf.Pow(distance.magnitude < 0.1f ? 0.1f : distance.magnitude, 1.2f);
 		}
+	}
+
+	public Vector3 getTip() {
+		return tip.transform.position;
 	}
 }

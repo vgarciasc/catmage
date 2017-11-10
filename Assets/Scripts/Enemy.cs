@@ -10,9 +10,20 @@ public class Enemy : MonoBehaviour {
 	public GameObject spriteSurrogate;
 	public GameObject bloodSplatterPrefab;
 	public GameObject shinePrefab;
-	bool is_dead = false;
+	public bool is_dead = false;
+	SpriteRenderer spriteRenderer;
+	Vector3 original_scale; 
+
+	void Start() {
+		spriteRenderer = this.GetComponentInChildren<SpriteRenderer>();
+		original_scale = spriteRenderer.transform.localScale;
+	}
 
 	public void takeHit(Arrow arrow) {
+		if (is_dead) {
+			return;
+		}
+		
 		arrow.pause();
 		death(arrow);
 	}
@@ -24,10 +35,10 @@ public class Enemy : MonoBehaviour {
 
 		this.GetComponentInChildren<PolygonCollider2D>().enabled = false;
 
-		SpecialCamera.getSpecialCamera().screenShake_(0.02f);
 		var shine = Instantiate(shinePrefab, arrow.getTip(), Quaternion.identity);
 		var scale_y = arrow.transform.localScale.y;
 		yield return shine.GetComponentInChildren<ShineAnim>().anim();
+		SpecialCamera.getSpecialCamera().screenShake_(0.02f);
 		arrow.unpause();
 
 		Color death_color = new Color(0.12f, 0.9f, 0.35f, 1f);
@@ -62,6 +73,21 @@ public class Enemy : MonoBehaviour {
 		this.gameObject.SetActive(false);
 	}
 
+	public IEnumerator spawnAnimation() {
+		this.GetComponentInChildren<PolygonCollider2D>().enabled = true;
+		spriteRenderer.enabled = false;
+		spriteSurrogate.SetActive(true);
+		spriteSurrogate.GetComponentInChildren<SpriteRenderer>().color = Color.white;
+		spriteRenderer.transform.localScale = original_scale;
+		spriteSurrogate.transform.localScale = Vector3.zero;
+		spriteSurrogate.transform.DOScale(Vector3.one, 0.5f);
+		yield return new WaitForSeconds(0.3f);
+		spriteRenderer.enabled = true;
+		var t1 = spriteSurrogate.GetComponentInChildren<SpriteRenderer>().DOFade(0f, 0.2f);
+		t1.SetEase(Ease.InBounce);
+		spriteSurrogate.SetActive(false);
+	}
+
 	void death(Arrow arrow) {
 		if (is_dead) {
 			return;
@@ -78,5 +104,9 @@ public class Enemy : MonoBehaviour {
 
 	public void reset() {
 		is_dead = false;
+		this.transform.localScale = original_scale;
+		spriteSurrogate.transform.localScale = Vector3.one;
+		spriteSurrogate.SetActive(false);
+		spriteRenderer.enabled = true;
 	}
 }

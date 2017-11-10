@@ -4,74 +4,34 @@ using UnityEngine;
 
 public enum DoorActivationTrigger {
 	SWITCH,
+	ALL_ENEMY_PERFECT_ELIMINATION,
 	NO_ENEMIES
 }
 
 public class Door : MonoBehaviour {
-
 	Animator anim;
-	bool door_open = false;
+	public bool door_open = false;
 
 	[Header("Activation Trigger")]
 	public DoorActivationTrigger trigger;
 
 	public Switch switch_obj;
 
-	void Start () {
+	void Start() {
 		anim = this.GetComponentInChildren<Animator>();
-
-		if (trigger == DoorActivationTrigger.SWITCH) {
-			switch_obj.hit_event += toggleDoor;
-		}
-		else if (trigger == DoorActivationTrigger.NO_ENEMIES) {
-			this.GetComponentInParent<Room>().update_enemy_alive_event += updateEnemyCount;
-		}
 	}
 
-	void updateEnemyCount(int count) {
-		if (trigger == DoorActivationTrigger.NO_ENEMIES) {
-			if (count == 0) {
-				openDoor();
-			}
-			else {
-				closeDoor();
-			}
-		}
-	}
-
-	void toggleDoor() {
-		if (door_open) {
-			closeDoor();
-		}
-		else {
-			openDoor();
-		}
-
-		door_open = !door_open;
-	}
-
-	void openDoor() {
+	public void openDoor() {
 		anim.SetBool("open", true);
+		door_open = true;
 	}
 
-	void closeDoor() {
+	public void closeDoor() {
 		anim.SetBool("open", false);
-	}
-
-	bool shouldOpen() {
-		if (trigger == DoorActivationTrigger.NO_ENEMIES) {
-			return false;
-		}
-		else if (trigger == DoorActivationTrigger.SWITCH) {
-			return switch_obj.switch_on;
-		}
-
-		return false;
+		door_open = false;
 	}
 
 	public void reset() {
-		if (!shouldOpen()) {
-			closeDoor();
-		}
+		closeDoor();
 	}
 }

@@ -16,6 +16,7 @@ public class Room : MonoBehaviour {
 	RoomManager roomManager;
 	Player player;
 	List<Enemy> enemies = new List<Enemy>();
+	List<Door> doors = new List<Door>();
 
 	bool room_active = false;
 	int id = -1;
@@ -26,6 +27,7 @@ public class Room : MonoBehaviour {
 	public int enemy_count = 0;
 	public bool shows_UI = true;
 	public bool battle_possible = true;
+	public bool only_perfect_elimination = true;
 
 	//reset variables
 	Vector3 player_start_position;
@@ -42,6 +44,9 @@ public class Room : MonoBehaviour {
 			enemies_start.Add(new EnemyStartPos(e, e.gameObject.transform.position));
 		}
 		enemy_count = enemies.Count;
+
+		doors = new List<Door>();
+		doors.AddRange(this.GetComponentsInChildren<Door>());
 
 		if (room_active) {
 			updateEnemyAliveCount(enemies.Count);
@@ -106,5 +111,65 @@ public class Room : MonoBehaviour {
 		}
 
 		updateEnemyAliveCount(enemies_start.Count);
+	}
+
+	public IEnumerator respawnEnemies() {
+		updateEnemyAliveCount(enemies_start.Count);
+		foreach (EnemyStartPos e in enemies_start) {
+			if (!e.enemy.is_dead) {
+				continue;
+			}
+
+			e.enemy.gameObject.transform.position = e.position;
+			e.enemy.gameObject.SetActive(true);
+			e.enemy.reset();
+			StartCoroutine(e.enemy.spawnAnimation());
+			yield return new WaitForSeconds(0.4f);
+		}
+	}
+
+	public bool enemiesDead() {
+		foreach (EnemyStartPos e in enemies_start) {
+			if (e.enemy.gameObject.activeSelf) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public void perfectElimination() {
+		foreach (Door d in doors) {
+			if (d.door_open) {
+				continue;
+			}
+
+			switch (d.trigger) {
+				case DoorActivationTrigger.ALL_ENEMY_PERFECT_ELIMINATION:
+					d.openDoor();
+					break;
+			}
+		}
+	}
+
+	public void openDoors() {
+		foreach (Door d in doors) {
+			if (d.door_open) {
+				continue;
+			}
+
+			switch (d.trigger) {
+				case DoorActivationTrigger.SWITCH:
+					if (d.switch_obj.switch_on) {
+						d.openDoor();
+					}
+					break;
+				case DoorActivationTrigger.NO_ENEMIES:
+					if (enemiesDead()) {
+						d.openDoor();
+					}
+					break;
+			}
+		}
 	}
 }

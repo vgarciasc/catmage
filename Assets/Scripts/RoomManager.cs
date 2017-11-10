@@ -11,6 +11,10 @@ public class RoomManager : MonoBehaviour {
 
 	public Room startRoom;
 
+	public static RoomManager getRoomManager() {
+		return (RoomManager) HushPuppy.safeFindComponent("GameController", "RoomManager");
+	}
+
 	void Start() {
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		ui = HushPuppy.safeFindComponent("GameController", "UIManager") as UIManager;
@@ -54,5 +58,16 @@ public class RoomManager : MonoBehaviour {
 
 		ui.toggle(room.shows_UI);
 		player.blockBattle(!room.battle_possible);
+	}
+
+	public void arrowStopped(Arrow arrow) {
+		if (currentRoom.enemiesDead()) {
+			currentRoom.perfectElimination();
+		}
+		else {
+			if (currentRoom.only_perfect_elimination) {
+				StartCoroutine(currentRoom.respawnEnemies());
+			}
+		}
 	}
 }

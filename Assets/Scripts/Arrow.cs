@@ -5,16 +5,18 @@ using DG.Tweening;
 
 public class Arrow : MonoBehaviour {
 
+	UIManager ui;
 	Rigidbody2D rb;
 	SpriteRenderer sr;
 	Player player;
 	Vector2 last_position;
-	float distance = 20f;
+	float max_distance = 20f;
+	float distance;
 	float last_change = 0f;
 	float speed = 5f;
 	bool is_stopped = false;
+	bool is_paused = false;
 	bool is_recalling = false;
-
 
 	Vector2 last_velocity;
 	LayerMask layer;
@@ -26,8 +28,10 @@ public class Arrow : MonoBehaviour {
 	void Start() {
 		rb = this.GetComponentInChildren<Rigidbody2D>();
 		sr = this.GetComponentInChildren<SpriteRenderer>();
+		ui = UIManager.getUIManager();
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		last_position = transform.position;
+		distance = max_distance;
 	}
 
 	void FixedUpdate() {
@@ -41,6 +45,9 @@ public class Arrow : MonoBehaviour {
 		}
 		else if (Input.GetKeyDown(KeyCode.U)) {
 			unpause();
+		}
+		else if (Input.GetKeyDown(KeyCode.S)) {
+			stop();
 		}
 
 		pointToDirection(rb.velocity);
@@ -88,6 +95,8 @@ public class Arrow : MonoBehaviour {
 	}
 
 	void handleMaxDistance() {
+		ui.updateDistanceTraveled(distance / max_distance);
+
 		if (is_recalling) {
 			return;
 		}
@@ -105,7 +114,7 @@ public class Arrow : MonoBehaviour {
 				rb.velocity = rb.velocity.normalized * magnitude * distance / 1f;
 			}
 
-			if (distance <= 0f) {
+			if (distance <= 0.1f) {
 				stop();
 			}
 		}
@@ -117,27 +126,30 @@ public class Arrow : MonoBehaviour {
 		rb.velocity = Vector2.zero;
 		is_stopped = true;
 		this.gameObject.layer = LayerMask.NameToLayer("Default");
+		RoomManager.getRoomManager().arrowStopped(this);
 	}
 
 	public void pause() {
-		if (is_stopped) {
+		if (is_paused) {
 			return;
 		}
 		
 		last_velocity = rb.velocity;
 		rb.velocity = Vector2.zero;
-		is_stopped = true;
+		rb.angularVelocity = 0f;
+		is_paused = true;
 		layer = this.gameObject.layer;
 		this.gameObject.layer = LayerMask.NameToLayer("Default");
 	}
 
 	public void unpause() {
 		rb.velocity = last_velocity;
-		is_stopped = false;
+		is_paused = false;
 		this.gameObject.layer = layer;
 	}
 
 	public void destroy() {
+		stop();
 		Destroy(this.gameObject);
 	}
 
@@ -162,7 +174,7 @@ public class Arrow : MonoBehaviour {
 	}
 
 	void handleRecall() {
-		if (is_recalling) {
+		if (is_recalling && !is_paused) {
 			Vector2 distance = (player.transform.position - this.transform.position);
 			rb.velocity = (distance.normalized * 5f);
 			rb.angularVelocity = 2500f / Mathf.Pow(distance.magnitude < 0.1f ? 0.1f : distance.magnitude, 1.2f);

@@ -39,7 +39,8 @@ public class Enemy : MonoBehaviour {
 		var scale_y = arrow.transform.localScale.y;
 		yield return shine.GetComponentInChildren<ShineAnim>().anim();
 		SpecialCamera.getSpecialCamera().screenShake_(0.02f);
-		arrow.unpause();
+		arrow.unpause(true, false);
+		arrow.startBoost(10f, 0.3f);
 
 		Color death_color = new Color(0.12f, 0.9f, 0.35f, 1f);
 		SpriteRenderer sr_aux = spriteSurrogate.GetComponentInChildren<SpriteRenderer>();

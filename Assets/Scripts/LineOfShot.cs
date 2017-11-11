@@ -40,6 +40,12 @@ public class LineOfShot : MonoBehaviour {
 
 		points.Add(hit.point);
 
+		if (hit.collider != null && 
+			(hit.collider.gameObject.tag == "Wall_Leaves"
+			|| hit.collider.GetComponentInChildren<SpinningBall>() != null)) {
+			return points;
+		}
+
 		distance_aux = Vector2.Distance(
 			points[points.Count - 1],
 			hit.point
@@ -73,12 +79,18 @@ public class LineOfShot : MonoBehaviour {
 				break;
 			}
 
+			points.Add(hit.point);
+
+			if (hit.collider != null && 
+				(hit.collider.gameObject.tag == "Wall_Leaves"
+				|| hit.collider.GetComponentInChildren<SpinningBall>() != null)) {
+				break;
+			}
+
 			distance_aux = Vector2.Distance(
 				points[points.Count - 1],
 				hit.point
 			);
-
-			points.Add(hit.point);
 			distance -= distance_aux;
 
 			reflection = Vector2.Reflect(
@@ -93,9 +105,25 @@ public class LineOfShot : MonoBehaviour {
 	}
 
 	public void Set_Line(List<Vector2> points) {
+		float max_view_distance = 15f;
 		line.enabled = true;
 		line.positionCount = points.Count;
+
 		for (int i = 0; i < points.Count; i++) {
+			if (i > 0) {
+				float distance = (points[i] - points[i-1]).magnitude;
+				if (distance > max_view_distance) {
+					line.SetPosition(i, 
+						points[i-1] + (points[i] - points[i-1]).normalized * max_view_distance
+					);
+					line.positionCount = i;
+					return;
+				}
+				else {
+					max_view_distance -= distance;
+				}
+			}
+
 			line.SetPosition(i, points[i]);
 		}
 	}

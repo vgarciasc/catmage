@@ -10,6 +10,7 @@ public class RoomManager : MonoBehaviour {
 	Room currentRoom = null;
 
 	public Room startRoom;
+	public bool camera_follow_player;
 
 	public static RoomManager getRoomManager() {
 		return (RoomManager) HushPuppy.safeFindComponent("GameController", "RoomManager");
@@ -51,10 +52,12 @@ public class RoomManager : MonoBehaviour {
 		room.setActive(true);
 		updateEnemyCount(room.enemy_count);
 
-		Camera.main.transform.localPosition = new Vector3(
-			room.transform.localPosition.x,
-			room.transform.localPosition.y,
-			-10);
+		if (Camera.main != null && !camera_follow_player) {
+			Camera.main.transform.localPosition = new Vector3(
+				room.transform.localPosition.x,
+				room.transform.localPosition.y,
+				-10);
+		}
 
 		ui.toggle(room.shows_UI);
 		player.blockBattle(!room.battle_possible);

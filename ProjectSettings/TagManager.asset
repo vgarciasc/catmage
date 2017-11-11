@@ -9,6 +9,8 @@ TagManager:
   - Switch
   - Arrow
   - PlayerComponent
+  - Wall_Leaves
+  - ArrowCapture
   layers:
   - Default
   - TransparentFX
@@ -21,8 +23,8 @@ TagManager:
   - Player
   - Arrow
   - Ricochettable
-  - 
-  - 
+  - SpecialArea
+  - Stoppable
   - 
   - 
   - 
@@ -49,11 +51,17 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Floor
+    uniqueID: 4031672773
+    locked: 0
   - name: Wall
     uniqueID: 3860174469
     locked: 0
   - name: Furniture
     uniqueID: 707080713
+    locked: 0
+  - name: Enemy
+    uniqueID: 764869109
     locked: 0
   - name: Arrow
     uniqueID: 4146782977

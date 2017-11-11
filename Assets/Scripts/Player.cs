@@ -105,9 +105,22 @@ public class Player : MonoBehaviour {
 				return;
 			}
 
+			var t1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			var p = this.transform.position;
+			var v1 = t1 - p;
+			var v2 = Vector3.right;
+
+			float angle = (Vector2.Angle(v1, v2) * Mathf.Deg2Rad);
+			bool orientation = v1.x * v2.y - v1.y * v2.x < 0;
+
+			Vector3 shot_pos = this.transform.position + new Vector3(
+				Mathf.Cos(orientation? angle : - angle),
+				Mathf.Sin(orientation? angle : - angle)
+			) * 0.5f;		
+
 			line.Set_Line(
-				LineOfShot.Get_Trajectory(this.transform.position,
-				Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position,
+				LineOfShot.Get_Trajectory(shot_pos,
+				Camera.main.ScreenToWorldPoint(Input.mousePosition) - shot_pos,
 				30f
 			));
 		}
@@ -154,8 +167,8 @@ public class Player : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
-		if (target.tag == "Arrow") {
-			target.GetComponentInChildren<Arrow>().destroy();
+		if (target.tag == "ArrowCapture") {
+			target.GetComponentInParent<Arrow>().destroy();
 			updateArrow(arrow_count + 1);
 		}
 	}

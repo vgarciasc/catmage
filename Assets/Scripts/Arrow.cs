@@ -9,7 +9,7 @@ public class Arrow : MonoBehaviour {
 	Rigidbody2D rb;
 	Player player;
 	Vector2 last_position;
-	float max_distance = 20f;
+	float max_distance = 10f;
 	float distance;
 	float last_change = 0f;
 	float speed = 5f;
@@ -22,6 +22,7 @@ public class Arrow : MonoBehaviour {
 	LayerMask layer;
 
 	public ParticleSystem recall_ps;
+	public ParticleSystem leaf_spread_ps;
 	public SpriteRenderer sr_outline;
 	public SpriteRenderer sr_fill;
 	public GameObject recall_circle;
@@ -75,6 +76,7 @@ public class Arrow : MonoBehaviour {
 		}
 
 		if (target.tag == "Wall_Leaves" && !is_recalling) {
+			leaf_spread_ps.Play();
 			distance = 0f;
 		}
 	}

@@ -14,24 +14,42 @@ public class Door : MonoBehaviour {
 
 	[Header("Activation Trigger")]
 	public DoorActivationTrigger trigger;
-
-	public Switch switch_obj;
+	public List<Switch> switch_obj = new List<Switch>();
 
 	void Start() {
 		anim = this.GetComponentInChildren<Animator>();
 	}
 
 	public void openDoor() {
+		if (door_open) {
+			return;
+		}
+
 		anim.SetBool("open", true);
 		door_open = true;
 	}
 
 	public void closeDoor() {
+		if (!door_open) {
+			return;
+		}
+
 		anim.SetBool("open", false);
 		door_open = false;
 	}
 
 	public void reset() {
-		closeDoor();
+		updateSwitch();
+	}
+
+	public void updateSwitch() {
+		foreach (Switch s in switch_obj) {
+			if (!s.switch_on) {
+				closeDoor();
+				return;
+			}
+		}
+
+		openDoor();
 	}
 }

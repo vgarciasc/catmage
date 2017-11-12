@@ -94,12 +94,12 @@ public class Room : MonoBehaviour {
 			a.destroy();
 		}
 
-		var switches = GameObject.FindObjectsOfType<Switch>();
+		var switches = this.GetComponentsInChildren<Switch>();
 		foreach (Switch s in switches) {
 			s.reset();
 		}
 
-		var doors = GameObject.FindObjectsOfType<Door>();
+		var doors = this.GetComponentsInChildren<Door>();
 		foreach (Door d in doors) {
 			d.reset();
 		}
@@ -160,9 +160,7 @@ public class Room : MonoBehaviour {
 
 			switch (d.trigger) {
 				case DoorActivationTrigger.SWITCH:
-					if (d.switch_obj.switch_on) {
-						d.openDoor();
-					}
+					d.updateSwitch();
 					break;
 				case DoorActivationTrigger.NO_ENEMIES:
 					if (enemiesDead()) {

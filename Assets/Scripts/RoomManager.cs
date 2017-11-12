@@ -38,6 +38,10 @@ public class RoomManager : MonoBehaviour {
 	void updateEnemyCount(int count) {
 		ui.updateEnemyCount(count);
 	}
+
+	public Room getCurrentRoom() {
+		return currentRoom;
+	}
 	
 	public void setCurrentRoom(Room room) {
 		if (currentRoom != null) {
@@ -57,6 +61,7 @@ public class RoomManager : MonoBehaviour {
 				room.transform.localPosition.x,
 				room.transform.localPosition.y,
 				-10);
+			Camera.main.GetComponentInChildren<SpecialCamera>().updateOriginalPos();
 		}
 
 		ui.toggle(room.shows_UI);

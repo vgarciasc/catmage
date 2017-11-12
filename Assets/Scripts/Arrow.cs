@@ -65,8 +65,11 @@ public class Arrow : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
 
-		if (target.tag == "Enemy") {
+		if (target.tag == "Enemy" && !is_stopped) {
 			target.GetComponentInChildren<Enemy>().takeHit(this);
+		}
+		if (target.tag == "Switch" && !is_stopped) {
+			target.GetComponentInChildren<Switch>().takeHit(this);
 		}
 
 		SpinningBall spin = target.GetComponentInChildren<SpinningBall>();
@@ -100,17 +103,21 @@ public class Arrow : MonoBehaviour {
 			(1 << LayerMask.NameToLayer("Ricochettable"))
 		);
 
-		Vector2 reflection;
-		if (hit.collider != null) {
-			reflection = Vector2.Reflect(
-				(Vector3) hit.point - transform.position,
-				hit.normal
-			);
-			rb.velocity = reflection.normalized * rb.velocity.magnitude;
+		if (hit.collider == null) {
+			return;
 		}
+
+		Vector2 reflection;
+		reflection = Vector2.Reflect(
+			(Vector3) hit.point - transform.position,
+			hit.normal
+		);
+		rb.velocity = reflection.normalized * rb.velocity.magnitude;
 
 		var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
 		rb.velocity = ((Vector3) aux[1] - this.transform.position).normalized * rb.velocity.magnitude;
+		
+		this.transform.position = hit.point + reflection;
 	}
 
 	void handleMaxDistance() {
@@ -131,6 +138,10 @@ public class Arrow : MonoBehaviour {
 			if (distance <= 1f) {
 				float magnitude = rb.velocity.magnitude;
 				rb.velocity = rb.velocity.normalized * magnitude * distance / 1f;
+				if (rb.velocity.magnitude < 0.1f) {
+					distance = 0f;
+					stop();
+				}
 			}
 
 			if (distance <= 0.1f) {
@@ -173,7 +184,7 @@ public class Arrow : MonoBehaviour {
 				boost_scale_tween.Kill();
 			}
 
-			this.transform.DOScaleY(this.transform.localScale.y / 0.75f, 0.1f);
+			this.transform.DOScaleY(1f, 0.1f);
 			sr_outline.DOColor(outline_color, 0.1f);
 
 			StopCoroutine(boosting);
@@ -190,12 +201,12 @@ public class Arrow : MonoBehaviour {
 	}
 
 	void stop() {
+		arrow_capture.SetActive(true);
 		rb.velocity = Vector2.zero;
 		is_stopped = true;
 		endBoost();
 		this.gameObject.layer = LayerMask.NameToLayer("Default");
 		RoomManager.getRoomManager().arrowStopped(this);
-		arrow_capture.SetActive(true);
 	}
 
 	public void pause() {
@@ -203,6 +214,7 @@ public class Arrow : MonoBehaviour {
 			return;
 		}
 		
+		PauseManager.getPauseManager().pause();
 		last_velocity = rb.velocity;
 		rb.velocity = Vector2.zero;
 		rb.angularVelocity = 0f;
@@ -220,6 +232,7 @@ public class Arrow : MonoBehaviour {
 			distance = max_distance;
 		}
 
+		PauseManager.getPauseManager().unpause();
 		is_paused = false;
 		arrow_capture.SetActive(false);
 		this.gameObject.layer = layer;

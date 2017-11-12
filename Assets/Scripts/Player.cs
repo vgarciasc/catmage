@@ -88,9 +88,15 @@ public class Player : MonoBehaviour {
 				return;
 			}
 
-			Vector2 velocity = Camera.main.ScreenToWorldPoint(Input.mousePosition) - this.transform.position;
-			GameObject arrow = Instantiate(arrow_prefab, this.transform.position, Quaternion.identity);
+			Vector2 velocity = aux_vec[1] - aux_vec[0];
+			GameObject arrow = Instantiate(arrow_prefab, aux_vec[0], Quaternion.identity);
 			arrow.GetComponentInChildren<Rigidbody2D>().velocity = velocity.normalized * 5f;
+			
+			string s = "";
+			foreach (Vector2 v in aux_vec) {
+				s += v.ToString() + ", ";
+			}
+
 			updateArrow(arrow_count - 1);
 		}
 	}
@@ -101,7 +107,7 @@ public class Player : MonoBehaviour {
 		}
 
 		if (Input.GetMouseButton(0)) {
-			if (just_ended_text) {
+			if (just_ended_text || arrow_count <= 0) {
 				return;
 			}
 
@@ -116,18 +122,21 @@ public class Player : MonoBehaviour {
 			Vector3 shot_pos = this.transform.position + new Vector3(
 				Mathf.Cos(orientation? angle : - angle),
 				Mathf.Sin(orientation? angle : - angle)
-			) * 0.5f;		
+			) * 0.5f;
 
 			line.Set_Line(
-				LineOfShot.Get_Trajectory(shot_pos,
-				Camera.main.ScreenToWorldPoint(Input.mousePosition) - shot_pos,
-				30f
+				aux_vec = LineOfShot.Get_Trajectory(
+					shot_pos,
+					Camera.main.ScreenToWorldPoint(Input.mousePosition) - shot_pos,
+					30f
 			));
 		}
 		if (Input.GetMouseButtonUp(0)) {
 			line.Deactivate();
 		}
 	}
+
+	List<Vector2> aux_vec = new List<Vector2>();
 
 	void handleReset() {
 		if (Input.GetKeyDown(KeyCode.R)) {

@@ -13,7 +13,7 @@ public class SpecialCamera : MonoBehaviour {
 	}
 
 	void Start() {
-		originalPos = this.transform.localPosition;
+		updateOriginalPos();
 	}
 
 	void Update () {
@@ -26,6 +26,10 @@ public class SpecialCamera : MonoBehaviour {
 		// }
 		// #endif
 	}
+
+    public void updateOriginalPos() {
+        originalPos = this.transform.localPosition;
+    }
 
     #region Screen Shake
     public void screenShake_(float power) { StartCoroutine(screenShake(power)); }

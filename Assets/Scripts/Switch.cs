@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Switch : MonoBehaviour {
 
-	public delegate void VoidDelegate();
-	public event VoidDelegate hit_event;
+	public GameObject shinePrefab;
+	public Door door;
+	public MovingPlatform platform;
 
 	Animator anim;
 	public bool switch_on = false;
@@ -21,14 +22,42 @@ public class Switch : MonoBehaviour {
 	void toggleSwitch(bool value) {
 		switch_on = value;
 		anim.SetBool("switch", switch_on);
+
+		if (door != null) {
+			door.updateSwitch();
+		}
+		if (platform != null) {
+			if (value) {
+				platform.pause();
+			} else {
+				platform.unpause();
+			}
+		}
+	}
+
+	IEnumerator hitAnimation(Arrow arrow) {
+		this.GetComponent<BoxCollider2D>().enabled = false;
+		
+		arrow.pause();
+
+		var shine = Instantiate(shinePrefab, arrow.getTip(), Quaternion.identity);
+		var scale_y = arrow.transform.localScale.y;
+		
+		yield return shine.GetComponentInChildren<ShineAnim>().anim();
+		
+		SpecialCamera.getSpecialCamera().screenShake_(0.02f);
+		arrow.unpause(true, true);
+		arrow.startBoost(10f, 0.3f);
+
+		toggleSwitch();
+
+		yield return new WaitForSeconds(1f);
+		
+		this.GetComponent<BoxCollider2D>().enabled = true;
 	}
 
 	public void takeHit(Arrow arrow) {
-		toggleSwitch();
-
-		if (hit_event != null) {
-			hit_event();
-		}
+		StartCoroutine(hitAnimation(arrow));
 	}
 
 	public void reset() {

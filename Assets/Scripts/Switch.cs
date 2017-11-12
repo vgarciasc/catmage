@@ -5,8 +5,9 @@ using UnityEngine;
 public class Switch : MonoBehaviour {
 
 	public GameObject shinePrefab;
-	public Door door;
-	public MovingPlatform platform;
+	public List<Door> doors;
+	public List<MovingPlatform> mps;
+	public List<Disappearable> disappearers;
 
 	Animator anim;
 	public bool switch_on = false;
@@ -22,17 +23,28 @@ public class Switch : MonoBehaviour {
 
 	void toggleSwitch(bool value) {
 		switch_on = value;
-		anim.SetBool("switch", switch_on);
+		updateEvents();
+		
+		if (anim != null) {
+			anim.SetBool("switch", switch_on);
+		}
+	}
 
-		if (door != null) {
+	protected void updateEvents() {
+		foreach(Door door in doors) {
 			door.updateSwitch();
 		}
-		if (platform != null) {
-			if (value) {
+
+		foreach (MovingPlatform platform in mps) {
+			if (switch_on) {
 				platform.pause();
 			} else {
 				platform.unpause();
 			}
+		}
+
+		foreach (Disappearable dis in disappearers) {
+			dis.updateSwitch();
 		}
 	}
 

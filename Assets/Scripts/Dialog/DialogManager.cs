@@ -56,7 +56,7 @@ public class DialogManager : MonoBehaviour {
 		while (_story.canContinue) {
 			string str = _story.Continue();
 
-			yield return Display_String(str, 1);
+			yield return Display_String(str, 2);
 			dialogAnim.SetBool("idle_on", true);
 			yield return new WaitUntil(() => (Input.GetButtonDown("Fire1") || Input.GetKeyDown(KeyCode.Q)));
 		}		

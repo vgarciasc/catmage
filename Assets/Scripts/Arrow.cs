@@ -80,6 +80,7 @@ public class Arrow : MonoBehaviour {
 
 		if (target.tag == "Wall_Leaves" && !is_recalling) {
 			leaf_spread_ps.Play();
+			leaf_spread_ps.transform.SetParent(this.transform.root);
 			distance = 0f;
 		}
 	}

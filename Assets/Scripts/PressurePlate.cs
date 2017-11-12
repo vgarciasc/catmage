@@ -10,6 +10,7 @@ public class PressurePlate : Switch {
 	public Sprite sprite_on;
 	float timeout = 1f;
 	float last_press = 0f;
+	public bool forever_on = true;
 
 	void OnTriggerStay2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
@@ -33,8 +34,12 @@ public class PressurePlate : Switch {
 	}
 
 	void toggle(bool value) {
+		if (switch_on && !value && forever_on) {
+			return;
+		}
+
 		switch_on = value;
-		door.updateSwitch();
+		updateEvents();
 
 		if (switch_on) {
 			sprite.sprite = sprite_on;

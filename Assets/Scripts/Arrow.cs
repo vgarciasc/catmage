@@ -13,7 +13,7 @@ public class Arrow : MonoBehaviour {
 	float distance;
 	float last_change = 0f;
 	float speed = 5f;
-	bool is_stopped = false;
+	public bool is_stopped = false;
 	bool is_paused = false;
 	bool is_recalling = false;
 	Color outline_color;
@@ -117,7 +117,7 @@ public class Arrow : MonoBehaviour {
 		var aux = LineOfShot.Get_Trajectory(this.transform.position, rb.velocity, 40);
 		rb.velocity = ((Vector3) aux[1] - this.transform.position).normalized * rb.velocity.magnitude;
 		
-		this.transform.position = hit.point + reflection;
+		// this.transform.position = hit.point + reflection;
 	}
 
 	void handleMaxDistance() {

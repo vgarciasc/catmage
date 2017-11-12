@@ -11,6 +11,7 @@ TagManager:
   - PlayerComponent
   - Wall_Leaves
   - ArrowCapture
+  - PressurePlate
   layers:
   - Default
   - TransparentFX

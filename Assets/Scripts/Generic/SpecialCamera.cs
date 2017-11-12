@@ -7,12 +7,15 @@ public class SpecialCamera : MonoBehaviour {
 
 	public RoomManager roomManager;
 	Vector3 originalPos;
+    public bool following_player;
+    Player player;
 
 	public static SpecialCamera getSpecialCamera() {
 		return (SpecialCamera) HushPuppy.safeFindComponent("MainCamera", "SpecialCamera");
 	}
 
 	void Start() {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Player>();
 		updateOriginalPos();
 	}
 
@@ -25,9 +28,20 @@ public class SpecialCamera : MonoBehaviour {
 		// 		-10);
 		// }
 		// #endif
+        if (following_player) {
+            updateOriginalPos();
+        }
 	}
 
     public void updateOriginalPos() {
+        if (following_player) {
+            originalPos = new Vector3(
+                player.transform.position.x,
+                player.transform.position.y,
+                -10);
+            this.transform.position = originalPos;
+        }
+
         originalPos = this.transform.localPosition;
     }
 

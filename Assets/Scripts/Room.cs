@@ -27,6 +27,7 @@ public class Room : MonoBehaviour {
 	public int enemy_count = 0;
 	public bool shows_UI = true;
 	public bool battle_possible = true;
+	public bool camera_follow_player = false;
 	public bool only_perfect_elimination = true;
 
 	//reset variables

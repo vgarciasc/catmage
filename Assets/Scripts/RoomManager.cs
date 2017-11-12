@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class RoomManager : MonoBehaviour {
 	UIManager ui;
+	SpecialCamera specialCamera;
 	Player player;
 
 	List<Room> rooms = new List<Room>();
 	Room currentRoom = null;
 
 	public Room startRoom;
-	public bool camera_follow_player;
 
 	public static RoomManager getRoomManager() {
 		return (RoomManager) HushPuppy.safeFindComponent("GameController", "RoomManager");
@@ -19,6 +19,7 @@ public class RoomManager : MonoBehaviour {
 	void Start() {
 		player = HushPuppy.safeFindComponent("Player", "Player") as Player;
 		ui = HushPuppy.safeFindComponent("GameController", "UIManager") as UIManager;
+		specialCamera = Camera.main.GetComponentInChildren<SpecialCamera>();
 
 		rooms.Clear();
 		rooms.AddRange(GameObject.FindObjectsOfType<Room>());
@@ -56,7 +57,8 @@ public class RoomManager : MonoBehaviour {
 		room.setActive(true);
 		updateEnemyCount(room.enemy_count);
 
-		if (Camera.main != null && !camera_follow_player) {
+		specialCamera.following_player = currentRoom.camera_follow_player;
+		if (Camera.main != null && !currentRoom.camera_follow_player) {
 			Camera.main.transform.localPosition = new Vector3(
 				room.transform.localPosition.x,
 				room.transform.localPosition.y,
@@ -75,6 +77,23 @@ public class RoomManager : MonoBehaviour {
 		else {
 			if (currentRoom.only_perfect_elimination) {
 				StartCoroutine(currentRoom.respawnEnemies());
+			}
+		}
+
+		List<Switch> switches = new List<Switch>();
+		bool was_perfect_strike = true;
+		foreach (Switch s in currentRoom.GetComponentsInChildren<Switch>()) {
+			if (s.perfect_strike) {
+				switches.Add(s);
+				if (!s.switch_on) {
+					was_perfect_strike = false;
+				}
+			}
+		}
+
+		foreach (Switch s in switches) {
+			if (!was_perfect_strike) {
+				s.arrowStopped();
 			}
 		}
 	}

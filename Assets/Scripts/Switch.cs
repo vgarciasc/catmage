@@ -10,6 +10,7 @@ public class Switch : MonoBehaviour {
 
 	Animator anim;
 	public bool switch_on = false;
+	public bool perfect_strike = false;
 
 	void Start() {
 		anim = this.GetComponentInChildren<Animator>();
@@ -62,6 +63,12 @@ public class Switch : MonoBehaviour {
 
 	public void reset() {
 		if (switch_on) {
+			toggleSwitch(false);
+		}
+	}
+
+	public void arrowStopped() {
+		if (perfect_strike) {
 			toggleSwitch(false);
 		}
 	}

@@ -5,7 +5,8 @@ using UnityEngine;
 public enum DoorActivationTrigger {
 	SWITCH,
 	ALL_ENEMY_PERFECT_ELIMINATION,
-	NO_ENEMIES
+	NO_ENEMIES,
+	PRESSURE_PLATE
 }
 
 public class Door : MonoBehaviour {
@@ -13,6 +14,7 @@ public class Door : MonoBehaviour {
 	public bool door_open = false;
 
 	[Header("Activation Trigger")]
+	public bool once_open_open_forever = false;
 	public DoorActivationTrigger trigger;
 	public List<Switch> switch_obj = new List<Switch>();
 
@@ -30,6 +32,10 @@ public class Door : MonoBehaviour {
 	}
 
 	public void closeDoor() {
+		if (door_open && once_open_open_forever) {
+			return;
+		}
+
 		if (!door_open) {
 			return;
 		}

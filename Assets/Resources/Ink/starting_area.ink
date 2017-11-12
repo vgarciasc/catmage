@@ -1,3 +1,4 @@
+INCLUDE forest.ink
 -> muk_boy_1
 
 === recepcionista ===

@@ -12,6 +12,7 @@ public class Player : MonoBehaviour {
 	bool block_recall = false;
 	bool block_shooting = false;
 	bool just_ended_text = false;
+	bool aiming = false;
 
 	Animator animator;
 	Rigidbody2D rb;
@@ -82,7 +83,7 @@ public class Player : MonoBehaviour {
 			return;
 		}
 		
-		if (Input.GetButtonUp("Fire1")) {
+		if (Input.GetButtonUp("Fire1") && aiming) {
 			if (just_ended_text) {
 				just_ended_text = false;
 				return;
@@ -102,10 +103,10 @@ public class Player : MonoBehaviour {
 	}
 
 	void handleLineOfShot() {
+		aiming = false;
 		if (block_shooting) {
 			return;
 		}
-
 		if (Input.GetMouseButton(0)) {
 			if (just_ended_text || arrow_count <= 0) {
 				return;
@@ -124,6 +125,22 @@ public class Player : MonoBehaviour {
 				Mathf.Sin(orientation? angle : - angle)
 			) * 0.5f;
 
+			var line_start = (shot_pos - this.transform.position) * -1f + this.transform.position;
+			var hit = Physics2D.Raycast(
+				line_start,
+				shot_pos - this.transform.position,
+				1f,
+				(1 << LayerMask.NameToLayer("Ricochettable")) | (1 << LayerMask.NameToLayer("Stoppable"))
+			);
+
+			if (hit.collider != null) {
+				// print(hit.collider.gameObject);
+				// Debug.Break();
+				line.Deactivate();
+				return;
+			}
+
+			aiming = true;
 			line.Set_Line(
 				aux_vec = LineOfShot.Get_Trajectory(
 					shot_pos,

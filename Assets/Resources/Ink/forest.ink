@@ -4,9 +4,10 @@
 NORMALMENTE EU SÓ CONSTRUO AS MÁQUINAS.
 MAS HOJE O ARQUITETO FICOU DOENTE E NÃO PÔDE VIR.
 ENTÃO ESTOU DANDO UM JEITO.
-- SE ESTIVER MUITO RUIM NÃO ME CRITIQUE!!!!!!!
-- SE QUISER UNS TROCADOS, FALE COMIGO.
-[ELE FICA DOENTE COM MUITA FREQUÊNCIA].
+- SE ESTIVER UMA MERDA NÃO ME CRITIQUE!!!!!!!
+- ELE FICA DOENTE COM MUITA FREQUÊNCIA.
+COM MUITA FREQUÊNCIA ATÉ DEMAIS...
+SE QUISER UM EMPREGO FALE COMIGO.
 }
 -> END
 
@@ -33,5 +34,11 @@ Não que eu queira sair daqui, é claro.
 === locked_door ===
 { stopping:
 - Esta é a porta mais fechada que você já viu na sua vida.
+}
+-> END
+
+=== segredo ===
+{ stopping:
+- oi igor
 }
 -> END

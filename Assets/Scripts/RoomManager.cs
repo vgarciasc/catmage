@@ -45,6 +45,8 @@ public class RoomManager : MonoBehaviour {
 	}
 	
 	public void setCurrentRoom(Room room) {
+		var specialCamera = Camera.main.GetComponentInChildren<SpecialCamera>();
+		
 		if (currentRoom != null) {
 			if (currentRoom == room) {
 				return;
@@ -56,6 +58,7 @@ public class RoomManager : MonoBehaviour {
 		currentRoom = room;
 		room.setActive(true);
 		updateEnemyCount(room.enemy_count);
+		specialCamera.setCurrentRoomBounds(currentRoom);
 
 		specialCamera.following_player = currentRoom.camera_follow_player;
 		if (Camera.main != null && !currentRoom.camera_follow_player) {
@@ -63,7 +66,7 @@ public class RoomManager : MonoBehaviour {
 				room.transform.localPosition.x,
 				room.transform.localPosition.y,
 				-10);
-			Camera.main.GetComponentInChildren<SpecialCamera>().updateOriginalPos();
+			specialCamera.updateOriginalPos();
 		}
 
 		ui.toggle(room.shows_UI);

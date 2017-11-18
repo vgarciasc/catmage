@@ -114,19 +114,22 @@ public class UIManager : MonoBehaviour {
 		enemies_text.text = "enemies: <color=#EEEEEE>" + count +"</color>";
 	}
 
+	float arrowCount = 1;
 	public void updateArrowCount(int count) {
 		float duration = 0.2f;
 		float size = 0.1f;
 
-		if (count == 0) {
+		if (arrowCount > 0 && count == 0) {
 			arrow_image.DOFade(0.2f, duration);
 			arrow_image.transform.DOScale(arrow_image.transform.localScale - Vector3.one * size, duration);
 		}
-		else {
+		else if (arrowCount == 0 && count == 1) {
 			arrow_image.DOFade(1f, duration);
 			arrow_image.transform.DOScale(arrow_image.transform.localScale + Vector3.one * size, duration);
 			distanceTraveled.DOFade(0f, 0.5f);
 		}
+
+		arrowCount = count;
 	}
 
 	public IEnumerator reset() {

@@ -40,7 +40,17 @@ public class Player : MonoBehaviour {
 		handleLineOfShot();
 		handleReset();
 		handleArrowRecall();
-		handlePause();
+		// handlePause();
+		handleRoll();
+	}
+
+	void handleRoll() {
+		if (Input.GetKeyDown(KeyCode.L)) {
+			animator.SetBool("roll", true);
+		}
+		else {
+			animator.SetBool("roll", false);
+		}
 	}
 
 	void handleMovement() {
@@ -83,9 +93,13 @@ public class Player : MonoBehaviour {
 			return;
 		}
 		
-		if (Input.GetButtonUp("Fire1") && aiming) {
+		if (Input.GetButtonUp("Fire1")) {
 			if (just_ended_text) {
 				just_ended_text = false;
+				return;
+			}
+
+			if (!aiming) {
 				return;
 			}
 
@@ -173,21 +187,21 @@ public class Player : MonoBehaviour {
 	bool isPausing = false;
 	float pause = 1f;
 	void handlePause() {
-		if (Input.GetKeyDown(KeyCode.F)) {
-			isPausing = true;
-		}
+		// // if (Input.GetKeyDown(KeyCode.F)) {
+		// // 	isPausing = true;
+		// // }
 
-		if (Input.GetKeyUp(KeyCode.F)) {
-			isPausing = false;
-		}
+		// // if (Input.GetKeyUp(KeyCode.F)) {
+		// // 	isPausing = false;
+		// // }
 
-		if (isPausing) {
-			pause -= Time.deltaTime * 0.1f;
-		}
+		// if (isPausing) {
+		// 	pause -= Time.deltaTime * 0.1f;
+		// }
 
-		if (pause <= 0f) {
-			pause = 0f;
-		}
+		// if (pause <= 0f) {
+		// 	pause = 0f;
+		// }
 		// ui.set_pause(pause);
 	}
 
@@ -197,9 +211,12 @@ public class Player : MonoBehaviour {
 			target.GetComponentInParent<Arrow>().destroy();
 			updateArrow(arrow_count + 1);
 		}
+		if (target.tag == "Enemy") {
+			AnimResetEnd();
+		}
 	}
 
-	void updateArrow(int amount) {
+	public void updateArrow(int amount) {
 		arrow_count = amount;
 		ui.updateArrowCount(arrow_count);
 	}
@@ -245,5 +262,34 @@ public class Player : MonoBehaviour {
 
 	void AnimResetEnd() {
 		roomManager.reset();
+	}
+
+	void AnimRollStart() {
+		print("X");
+		block_walk = true;
+
+		int x = 0;
+		int y = 0;
+		float speed = 4;
+		
+		if (Input.GetKey(KeyCode.LeftArrow)) {
+			x = -1;
+		}
+		else if (Input.GetKey(KeyCode.RightArrow)) {
+			x = 1;
+		}
+		if (Input.GetKey(KeyCode.UpArrow)) {
+			y = 1;
+		}
+		else if (Input.GetKey(KeyCode.DownArrow)) {
+			y = -1;
+		}
+
+		rb.velocity = new Vector3(x, y, 0).normalized * 20;
+	}
+
+	void AnimRollEnd() {
+		block_walk = false;
+		rb.velocity = Vector3.zero;
 	}
 }

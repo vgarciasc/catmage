@@ -16,7 +16,7 @@ public class Enemy : MonoBehaviour {
 
 	void Start() {
 		spriteRenderer = this.GetComponentInChildren<SpriteRenderer>();
-		original_scale = spriteRenderer.transform.localScale;
+		original_scale = this.transform.localScale;
 	}
 
 	public void takeHit(Arrow arrow) {
@@ -34,6 +34,8 @@ public class Enemy : MonoBehaviour {
 		}
 
 		this.GetComponentInChildren<PolygonCollider2D>().enabled = false;
+		this.GetComponentInParent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+		this.GetComponentInParent<Rigidbody2D>().velocity = Vector3.zero;
 
 		var shine = Instantiate(shinePrefab, arrow.getTip(), Quaternion.identity);
 		var scale_y = arrow.transform.localScale.y;

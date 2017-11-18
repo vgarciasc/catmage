@@ -31,6 +31,6 @@ public class TitleScreen : MonoBehaviour {
 	IEnumerator Exit() {
 		whitescreen.DOColor(Color.white, 2f);
 		yield return new WaitForSeconds(2f);
-		SceneManager.LoadScene("Main");
+		SceneManager.LoadScene("Forest");
 	}
 }

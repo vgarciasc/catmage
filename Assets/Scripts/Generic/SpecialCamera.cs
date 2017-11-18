@@ -90,6 +90,7 @@ public class SpecialCamera : MonoBehaviour {
         // if (power < 0.05f) {
         //     power = 0.1f;
         // }
+        power *= 8f;
         is_shaking = true;
 
         for (int i = 0; i < 10; i++) {

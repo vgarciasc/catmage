@@ -35,15 +35,15 @@ public class DialogManager : MonoBehaviour {
 		}
 	}
 
-	public void start(string dialogID, Sprite portrait) {
-		handlePortraits(portrait);
+	public void start(DialogCharacter character) {
+		handlePortraits(character);
 
 		_story = new Story(inkAsset.text);
 		if (savedJson != "") {
 			_story.state.LoadJson(savedJson);
 		}
 
-		_story.ChoosePathString(dialogID);
+		_story.ChoosePathString(character.dialogID);
 
 		toggle(true);
 		StartCoroutine(Text());
@@ -86,8 +86,8 @@ public class DialogManager : MonoBehaviour {
 		dialogText.text = text;
 	}
 
-	void handlePortraits(Sprite portrait) {
-		if (portrait == null) {
+	void handlePortraits(DialogCharacter character) {
+		if (character.portrait == null) {
 			portraitLeft.gameObject.SetActive(false);
 			portraitRight.gameObject.SetActive(false);
 			return;
@@ -96,6 +96,11 @@ public class DialogManager : MonoBehaviour {
 		portraitLeft.gameObject.SetActive(true);
 		portraitRight.gameObject.SetActive(true);
 
-		portraitRight.sprite = portrait;
+		portraitRight.transform.localScale = new Vector3(
+			Mathf.Abs(portraitRight.transform.localScale.x) * (character.flipSprite? -1 : 1),
+			portraitRight.transform.localScale.y,
+			portraitRight.transform.localScale.z
+		);
+		portraitRight.sprite = character.portrait;
 	}
 }

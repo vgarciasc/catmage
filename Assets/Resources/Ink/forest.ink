@@ -33,12 +33,39 @@ Não que eu queira sair daqui, é claro.
 
 === locked_door ===
 { stopping:
-- Esta é a porta mais fechada que você já viu na sua vida.
+- Esta é a porta mais fechada que você já viu na sua vida
 }
 -> END
 
 === segredo ===
 { stopping:
-- oi igor
+- boaaa
 }
 -> END
+
+=== noir_recepcionista ===
+{ stopping:
+- oi
+bem-vindo ao Calabouço da Demo(TM)
+eu sou legalmente obrigada a pedir que você assine algumas coisas
+mas não temos nenhuma animação ainda
+então ia ficar meio estúpido
+eu nem trabalho aqui. sou apenas uma estagiária
+dito isso, preciso falar algumas coisas antes de te liberar
+- as teclas importantes são Q e R
+e o mouse. o mouse é bem importante também
+mas se você já está falando comigo então já sabe da tecla Q
+meio mal-feito né
+- desculpa se estou te incomodando mas é que estou sozinha faz um tempo e gosto muito de falar
+na verdade eu me tranquei do lado de dentro
+aquela porta ali é a saída
+não que você saiba porque você caiu do teto
+(como eu disse não tem muitas animações nesse jogo)
+- eu acho bem provável que essa não seja a primeira vez que estamos conversando
+se esse for o caso, tenha paciência.
+pelo menos você não está trancado e sem nada pra fazer
+(no caso você tem algo pra fazer. estamos ambos trancados amigo)
+- cansei. deixa eu respirar um pouco
+}
+-> END
+

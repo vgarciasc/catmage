@@ -45,18 +45,18 @@ public class Arrow : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Input.GetKeyDown(KeyCode.P)) {
-			pause();
-		}
-		else if (Input.GetKeyDown(KeyCode.U)) {
-			unpause(true, false);
-		}
-		else if (Input.GetKeyDown(KeyCode.S)) {
-			stop();
-		}
-		else if (Input.GetKeyDown(KeyCode.B)) {
-			startBoost(10f, 1f);
-		}
+		// if (Input.GetKeyDown(KeyCode.P)) {
+		// 	pause();
+		// }
+		// else if (Input.GetKeyDown(KeyCode.U)) {
+		// 	unpause(true, false);
+		// }
+		// else if (Input.GetKeyDown(KeyCode.S)) {
+		// 	stop();
+		// }
+		// else if (Input.GetKeyDown(KeyCode.B)) {
+		// 	startBoost(10f, 1f);
+		// }
 
 		pointToDirection(rb.velocity);
 		handleRecall();
@@ -65,7 +65,7 @@ public class Arrow : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collider) {
 		GameObject target = collider.gameObject;
 
-		if (target.tag == "Enemy" && !is_stopped) {
+		if (target.tag == "Enemy" && (!is_stopped || is_recalling)) {
 			target.GetComponentInChildren<Enemy>().takeHit(this);
 		}
 		if (target.tag == "Switch" && !is_stopped) {
@@ -167,10 +167,8 @@ public class Arrow : MonoBehaviour {
 		boost_color_tween = sr_outline.DOColor(new Color(0.12f, 0.9f, 0.35f, 1f), 0.4f);
 		boost_scale_tween = this.transform.DOScaleY(this.transform.localScale.y * 0.75f, 0.3f);
 
-		// print ("rb_velocity A1: " + rb.velocity);
 		orig_boost_velocity = rb.velocity;
 		rb.velocity = rb.velocity + rb.velocity.normalized * current_boost;
-		// print ("rb_velocity A2: " + rb.velocity);
 
 		yield return new WaitForSeconds(duration);
 		endBoost();
@@ -191,12 +189,8 @@ public class Arrow : MonoBehaviour {
 			StopCoroutine(boosting);
 			boosting = null;
 
-			// print ("rb.velocity B1: " + rb.velocity);
-			// print ("rb.velocity.magnitude: " + rb.velocity.magnitude);
-			// print ("(orig_boost_velocity + orig_boost_velocity.normalized * current_boost).magnitude: " + (orig_boost_velocity + orig_boost_velocity.normalized * current_boost).magnitude);
 			if (Mathf.Abs(rb.velocity.magnitude - (orig_boost_velocity + orig_boost_velocity.normalized * current_boost).magnitude) < 0.1f) {
 				rb.velocity = rb.velocity.normalized * speed;
-				// print ("rb.velocity B2: " + rb.velocity);
 			}
 		}
 	}
@@ -263,7 +257,7 @@ public class Arrow : MonoBehaviour {
 		tween.SetEase(Ease.OutCubic);
 
 		// this.gameObject.layer = LayerMask.NameToLayer("Default");
-		arrow_capture.SetActive(true);
+		// arrow_capture.SetActive(true);
 	}
 
 	void handleRecall() {
@@ -271,7 +265,20 @@ public class Arrow : MonoBehaviour {
 			Vector2 distance = (player.transform.position - this.transform.position);
 			rb.velocity = (distance.normalized * 5f);
 			rb.angularVelocity = 2500f / Mathf.Pow(distance.magnitude < 0.1f ? 0.1f : distance.magnitude, 1.2f);
+		
+			float d = Vector2.Distance(this.transform.position, player.transform.position);
+			if (d < 1f) {
+				is_recalling = false;
+				StartCoroutine(haltAndCatchArrow());
+			}
 		}
+	}
+	
+	IEnumerator haltAndCatchArrow() {
+		this.transform.DOScale(Vector3.zero, 0.4f);
+		player.updateArrow(1);
+		yield return new WaitForSeconds(1f);
+		destroy();
 	}
 
 	public Vector3 getTip() {

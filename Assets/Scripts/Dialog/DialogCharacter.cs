@@ -6,7 +6,8 @@ public class DialogCharacter : MonoBehaviour {
 
 	public string dialogID = "";
 	public Sprite portrait;
-	
+	public bool flipSprite = false;
+
 	DialogManager dialogManager;
 	bool in_range = false;
 	bool talking = false;
@@ -35,7 +36,7 @@ public class DialogCharacter : MonoBehaviour {
 
 	void handleText() {
 		if (Input.GetKeyDown(KeyCode.Q) && in_range && !dialogManager.dialog_active) {
-			dialogManager.start(dialogID, portrait);
+			dialogManager.start(this);
 		}
 	}
 }

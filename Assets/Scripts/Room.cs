@@ -29,6 +29,7 @@ public class Room : MonoBehaviour {
 	public bool battle_possible = true;
 	public bool camera_follow_player = false;
 	public bool only_perfect_elimination = true;
+	public bool ever_visited = false;
 
 	//reset variables
 	Vector3 player_start_position;
@@ -66,6 +67,7 @@ public class Room : MonoBehaviour {
 		}
 		
 		if (value) {
+			ever_visited = true;
 			updateEnemyAliveCount(enemy_count);
 			player_start_position = player.transform.position;
 		}

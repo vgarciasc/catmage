@@ -17,6 +17,8 @@ public class Door : MonoBehaviour {
 	public bool once_open_open_forever = false;
 	public DoorActivationTrigger trigger;
 	public List<Switch> switch_obj = new List<Switch>();
+	public bool open_forever_if_room_entered = false;
+	public Room roomToEnter = null;
 
 	void Start() {
 		anim = this.GetComponentInChildren<Animator>();
@@ -33,6 +35,10 @@ public class Door : MonoBehaviour {
 
 	public void closeDoor() {
 		if (door_open && once_open_open_forever) {
+			return;
+		}
+
+		if (open_forever_if_room_entered && roomToEnter!= null && roomToEnter.ever_visited) {
 			return;
 		}
 
